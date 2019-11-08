@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import edu.gvsu.cis.convcalc.dummy.HistoryContent;
-import edu.gvsu.cis.convcalc.dummy.HistoryContent.DummyItem;
+import edu.gvsu.cis.convcalc.dummy.HistoryContent.HistoryItem;
 
 /**
  * A fragment representing a list of Items.
@@ -70,6 +71,10 @@ public class HistoryFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             recyclerView.setAdapter(new HistoryAdapter(HistoryContent.ITEMS, mListener));
+
+            DividerItemDecoration did = new DividerItemDecoration(recyclerView.getContext(),
+                    DividerItemDecoration.VERTICAL);
+            recyclerView.addItemDecoration(did);
         }
         return view;
     }

@@ -8,23 +8,30 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import edu.gvsu.cis.convcalc.HistoryFragment.OnListFragmentInteractionListener;
-import edu.gvsu.cis.convcalc.dummy.HistoryContent.DummyItem;
+import edu.gvsu.cis.convcalc.dummy.HistoryContent;
+import edu.gvsu.cis.convcalc.dummy.HistoryContent.HistoryItem;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link edu.gvsu.cis.convcalc.dummy.HistoryContent.HistoryItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<HistoryContent.HistoryItem> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public HistoryAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public HistoryAdapter(List<HistoryContent.HistoryItem> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
+    }
+
+    //Temp Code to get it ro run
+    @Override
+    public int getItemCount(){
+        return 1;
     }
 
     @Override
@@ -37,8 +44,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mP1.setText(holder.mItem.toString());
+        holder.mDateTime.setText(holder.mItem.timestamp.toString());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,27 +59,23 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         });
     }
 
-    @Override
-    public int getItemCount() {
-        return mValues.size();
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView mP1;
+        public final TextView mDateTime;
+        public HistoryContent.HistoryItem mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mP1 = (TextView) view.findViewById(R.id.p1);
+            mDateTime = (TextView) view.findViewById(R.id.timestamp);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mDateTime.getText() + "'";
         }
     }
 }
+
