@@ -132,5 +132,8 @@
         app:layout_constraintStart_toEndOf="@+id/clearButton"
         app:layout_constraintTop_toTopOf="@+id/clearButton" />
 
+    <item android:title="History"
+        android:id="@+id/action_history"
+        app:showAsAction="never" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
