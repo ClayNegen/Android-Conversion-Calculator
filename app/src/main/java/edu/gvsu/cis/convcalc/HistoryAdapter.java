@@ -5,12 +5,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.truizlop.sectionedrecyclerview.SectionedRecyclerViewAdapter;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import edu.gvsu.cis.convcalc.HistoryFragment.OnListFragmentInteractionListener;
 import edu.gvsu.cis.convcalc.dummy.HistoryContent;
 import edu.gvsu.cis.convcalc.dummy.HistoryContent.HistoryItem;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -18,34 +26,90 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
+public class HistoryAdapter extends
+        SectionedRecyclerViewAdapter<HistoryAdapter.HeaderViewHolder,
+                HistoryAdapter.ViewHolder,
+                HistoryAdapter.FooterViewHolder> {
 
     private final List<HistoryContent.HistoryItem> mValues;
     private final OnListFragmentInteractionListener mListener;
 
+    private final HashMap<String,List<HistoryItem>> dayValues;
+    private final List<String> sectionHeaders;
+
     public HistoryAdapter(List<HistoryContent.HistoryItem> items, OnListFragmentInteractionListener listener) {
         mValues = items;
+        this.dayValues = new HashMap<String,List<HistoryItem>>();
+        this.sectionHeaders = new ArrayList<String>();
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+
+        for (HistoryItem hi : items) {
+            String key = "Entries for " + fmt.print(hi.timestamp);
+            List<HistoryItem> list = this.dayValues.get(key);
+            if (list == null) {
+                list = new ArrayList<HistoryItem>();
+                this.dayValues.put(key, list);
+                this.sectionHeaders.add(key);
+            }
+            list.add(hi);
+        }
         mListener = listener;
     }
 
-    //Temp Code to get it ro run
     @Override
-    public int getItemCount(){
-        return 1;
+    protected int getSectionCount() {
+        return this.sectionHeaders.size();
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    protected int getItemCountForSection(int section) {
+        return this.dayValues.get(this.sectionHeaders.get(section)).size();
+    }
+
+    @Override
+    protected boolean hasFooterInSection(int section) {
+        return false;
+    }
+
+    @Override
+    protected HeaderViewHolder onCreateSectionHeaderViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_section_header, parent, false);
+        return new HeaderViewHolder(view);
+    }
+
+    @Override
+    protected FooterViewHolder onCreateSectionFooterViewHolder(ViewGroup parent, int viewType) {
+        return null;
+    }
+
+    @Override
+    protected ViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_history, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
+    protected void onBindSectionHeaderViewHolder(HeaderViewHolder holder, int section) {
+        holder.header.setText(this.sectionHeaders.get(section));
+    }
+
+    @Override
+    protected void onBindSectionFooterViewHolder(FooterViewHolder footerViewHolder, int i) {
+
+    }
+
+    @Override
+    protected void onBindItemViewHolder(ViewHolder holder, int section, int position) {
+        holder.mItem = this.dayValues.get(this.sectionHeaders.get(section)).get(position);
         holder.mP1.setText(holder.mItem.toString());
         holder.mDateTime.setText(holder.mItem.timestamp.toString());
+        if (holder.mItem.mode.equals("Length")) {
+            // length icon          holder.mImage.setImageDrawable(holder.mImage.getResources().getDrawable(R.drawable.length_icon));
+        } else {
+            // volume icon
+            holder.mImage.setImageDrawable(holder.mImage.getResources().getDrawable(R.drawable.volume_icon));
+        }
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +127,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         public final View mView;
         public final TextView mP1;
         public final TextView mDateTime;
+        public final ImageView mImage;
         public HistoryContent.HistoryItem mItem;
 
         public ViewHolder(View view) {
@@ -70,6 +135,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             mView = view;
             mP1 = (TextView) view.findViewById(R.id.p1);
             mDateTime = (TextView) view.findViewById(R.id.timestamp);
+            mImage = (ImageView) view.findViewById(R.id.imageView);
         }
 
         @Override
@@ -77,5 +143,20 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             return super.toString() + " '" + mDateTime.getText() + "'";
         }
     }
+
+    public class HeaderViewHolder extends RecyclerView.ViewHolder {
+        public TextView header;
+        public HeaderViewHolder(View view) {
+            super(view);
+            header = (TextView) view.findViewById(R.id.header);
+        }
+    }
+
+    public class FooterViewHolder extends RecyclerView.ViewHolder {
+        public FooterViewHolder(View view) {
+            super(view);
+        }
+    }
+
 }
 
